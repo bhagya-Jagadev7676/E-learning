@@ -1,7 +1,8 @@
 import './App.css';
 import {BrowserRouter , Routes , Route} from 'react-router-dom';
 import Login from './pages/auth/login';
-import Register from './pages/auth/register'
+import Register from './pages/auth/register';
+import ForgotPassword from './pages/auth/forgotPassword';
 import Course from './pages/course/course';
 import Courses from './pages/course/Courses';
 import Profile from './pages/profile/profile';
@@ -26,6 +27,7 @@ function App() {
           <Route path='/admin' Component={AdminDashboard}></Route>
           <Route path='/login' Component={Login}></Route>
           <Route path='/register' Component={Register}></Route>
+          <Route path='/forgot-password' Component={ForgotPassword}></Route>
           <Route path='/' Component={Home}></Route>
           <Route path='/courses' Component={Courses}></Route>
           <Route path='/course/:id' Component={Course}></Route>
