@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext";
 import Navbar from "../../Components/common/Navbar";
 import { authService } from "../../api/auth.service";
-import { Mail, Lock, LogIn, Shield, User } from "lucide-react";
+import { Mail, Lock, LogIn } from "lucide-react";
 import { InputField } from "../../Components/common/InputFeild";
 
 function Login() {
@@ -11,15 +11,13 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [loginType, setLoginType] = useState(null); // 'admin' or 'user'
 
   const navigate = useNavigate();
   const { setUser } = useUserContext();
 
-  const login = async (e, type) => {
+  const login = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setLoginType(type);
     setError("");
 
     try {
@@ -29,22 +27,6 @@ function Login() {
         if (result.user) {
           setUser(result.user);
         }
-        
-        // Validate login type matches user role
-        if (type === 'admin' && result.user.role !== 'ADMIN') {
-          setError("Access denied. Admin credentials required.");
-          setIsLoading(false);
-          setLoginType(null);
-          return;
-        }
-        
-        if (type === 'user' && result.user.role === 'ADMIN') {
-          setError("Please use Admin Login for admin accounts.");
-          setIsLoading(false);
-          setLoginType(null);
-          return;
-        }
-        
         // Route based on user role
         if (result.user.role === "ADMIN") {
           navigate("/admin");
@@ -59,7 +41,6 @@ function Login() {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
-      setLoginType(null);
     }
   };
 
@@ -78,7 +59,7 @@ function Login() {
           </div>
 
           <div className="bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
-            <form autoComplete="off" onSubmit={(e) => e.preventDefault()} className="space-y-6">
+            <form autoComplete="off" onSubmit={login} className="space-y-6">
               <InputField
                 id="email"
                 name="email"
@@ -118,87 +99,42 @@ function Login() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={(e) => login(e, 'user')}
-                  disabled={isLoading}
-                  className={`py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300 ${isLoading && loginType === 'user'
-                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                    : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
-                    }`}
-                >
-                  {isLoading && loginType === 'user' ? (
-                    <div className="flex items-center justify-center">
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <User className="h-5 w-5" />
-                      <span>User Login</span>
-                    </div>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={(e) => login(e, 'admin')}
-                  disabled={isLoading}
-                  className={`py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-purple-300 ${isLoading && loginType === 'admin'
-                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800"
-                    }`}
-                >
-                  {isLoading && loginType === 'admin' ? (
-                    <div className="flex items-center justify-center">
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <Shield className="h-5 w-5" />
-                      <span>Admin Login</span>
-                    </div>
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-300 ${isLoading
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+                  }`}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Signing In...
+                  </div>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
             </form>
 
             <div className="mt-8">
